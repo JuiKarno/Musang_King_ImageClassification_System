@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - MusangKing System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .about-header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(135deg, var(--primary-pale) 0%, white 100%);
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+        }
+
+        .about-header h1 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .about-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .member-card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border-top: 4px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--text-secondary);
+        }
+
+        .member-role {
+            display: inline-block;
+            background: var(--primary-pale);
+            color: var(--primary-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .member-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .member-id {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .tech-badge {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}"
+                    style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{{ url_for('static', filename='images/MK_LOGO.png') }}" alt="MusangKing Logo"
+                        class="logo-image">
+                    <div class="brand-info">
+                        <span class="app-name">MusangKing</span>
+                        <span class="subtitle">Classification System</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="header-nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('datasets') }}" class="nav-link">Datasets</a>
+                <a href="{{ url_for('documentation') }}" class="nav-link">Documentation</a>
+                <a href="{{ url_for('about') }}" class="nav-link active">About Project</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="version-badge">v2.0 Hybrid</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard" style="display: block; max-width: 1200px; margin: 0 auto; padding: 2rem;">
+
+            <div class="about-header">
+                <h1>MusangKing Classification System</h1>
+                <p>An Integrated Image Processing System for the Classification of Durian Ripeness and Variety using
+                    K-Means Clustering and Morphological Feature Extraction</p>
+                <div style="margin-top: 1rem;">
+                    <span class="version-badge" style="background: var(--primary); color: white;">CSC566 | Oct 2025 –
+                        Mac 2026</span>
+                </div>
+            </div>
+
+            <section class="panel" style="padding: 2.5rem; margin-bottom: 3rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-dark);">Group MusangKing Team
+                </h2>
+
+                <div class="team-grid">
+                    <!-- Member 1 -->
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍💻</div>
+                        <span class="member-role">Group Member</span>
+                        <h3 class="member-name">Yazid Zaqwan Hakim</h3>
+                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Yusop Zaki</p>
+                        <p class="member-id">ID: 2024977637</p>
+                    </div>
+
+                    <!-- Member 2 -->
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍💻</div>
+                        <span class="member-role">Group Member</span>
+                        <h3 class="member-name">Muhamd Zulkarnain</h3>
+                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Samsudin</p>
+                        <p class="member-id">ID: 2024793133</p>
+                    </div>
+
+                    <!-- Member 3 -->
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍💻</div>
+                        <span class="member-role">Group Member</span>
+                        <h3 class="member-name">Amirul Fariz</h3>
+                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Zahari</p>
+                        <p class="member-id">ID: 2024745641</p>
+                    </div>
+
+                    <!-- Member 4 -->
+                    <div class="member-card">
+                        <div class="member-avatar">👨‍💻</div>
+                        <span class="member-role">Group Member</span>
+                        <h3 class="member-name">Mohamad Bukhari</h3>
+                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Ahmad Huzairi</p>
+                        <p class="member-id">ID: 2024916761</p>
+                    </div>
+                </div>
+
+                <!-- Objectives -->
+                <div style="margin-top: 4rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">🎯 Project Objectives</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li
+                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+                            <strong>1. Variety Classification:</strong> To accurately distinguish between Musang King,
+                            Black Thorn, and Udang Merah using external features.
+                        </li>
+                        <li
+                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+                            <strong>2. Ripeness Detection:</strong> To classify fruit ripeness into Mature, Immature,
+                            and Defective categories.
+                        </li>
+                        <li
+                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
+                            <strong>3. Hybrid Segmentation:</strong> To evaluate and implement a hybrid approach
+                            combining traditional K-Means clustering with modern AI fallback for robust object
+                            detection.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="tech-stack">
+                    <span class="tech-badge">🐍 Python</span>
+                    <span class="tech-badge">🌶️ Flask</span>
+                    <span class="tech-badge">👁️ OpenCV</span>
+                    <span class="tech-badge">🤖 XGBoost</span>
+                    <span class="tech-badge">📉 Scikit-Learn</span>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <p>MusangKing Classification System &copy; 2026 | CSC566 Image Processing Project</p>
+        </footer>
+    </div>
+</body>
+
+</html>

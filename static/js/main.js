@@ -1,6 +1,6 @@
 /**
  * MusangKing Classification System - Frontend JavaScript
- * Handles image upload, processing, and results display
+ * Simplified for Hybrid Segmentation (K-Means + AI Fallback)
  */
 
 // DOM Elements
@@ -10,11 +10,6 @@ const uploadPreview = document.getElementById('upload-preview');
 const previewImage = document.getElementById('preview-image');
 const clearBtn = document.getElementById('clear-btn');
 const processBtn = document.getElementById('process-btn');
-
-const gammaSlider = document.getElementById('gamma-slider');
-const gammaValue = document.getElementById('gamma-value');
-const kSlider = document.getElementById('k-slider');
-const kValue = document.getElementById('k-value');
 
 const originalContainer = document.getElementById('original-container');
 const originalImage = document.getElementById('original-image');
@@ -35,12 +30,10 @@ let currentFilename = null;
 // Upload Handling
 // ============================================
 
-// Click to upload
 uploadArea.addEventListener('click', () => {
     imageInput.click();
 });
 
-// File input change
 imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -48,7 +41,6 @@ imageInput.addEventListener('change', (e) => {
     }
 });
 
-// Drag and drop
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.classList.add('dragover');
@@ -68,27 +60,30 @@ uploadArea.addEventListener('drop', (e) => {
     }
 });
 
-// Clear button
 clearBtn.addEventListener('click', () => {
     resetUpload();
 });
 
-// Handle file upload
 async function handleFileUpload(file) {
     const formData = new FormData();
     formData.append('image', file);
 
     try {
-        // Show preview immediately
         const reader = new FileReader();
         reader.onload = (e) => {
             previewImage.src = e.target.result;
             uploadArea.style.display = 'none';
             uploadPreview.style.display = 'block';
+
+            // Also show in original container
+            if (originalImage && originalContainer) {
+                originalImage.src = e.target.result;
+                originalImage.style.display = 'block';
+                originalContainer.querySelector('.placeholder').style.display = 'none';
+            }
         };
         reader.readAsDataURL(file);
 
-        // Upload to server
         const response = await fetch('/upload', {
             method: 'POST',
             body: formData
@@ -96,14 +91,11 @@ async function handleFileUpload(file) {
 
         const data = await response.json();
 
-        if (data.success) {
+        if (data.filename) {
             currentFilename = data.filename;
             processBtn.disabled = false;
-
-            // Show original image in visualization panel
-            showOriginalImage(data.filepath);
         } else {
-            alert('Upload failed: ' + data.error);
+            alert('Upload failed: ' + (data.error || 'Unknown error'));
             resetUpload();
         }
     } catch (error) {
@@ -113,14 +105,6 @@ async function handleFileUpload(file) {
     }
 }
 
-// Show original image
-function showOriginalImage(filepath) {
-    originalImage.src = filepath;
-    originalImage.style.display = 'block';
-    originalContainer.querySelector('.placeholder').style.display = 'none';
-}
-
-// Reset upload
 function resetUpload() {
     imageInput.value = '';
     previewImage.src = '';
@@ -130,26 +114,18 @@ function resetUpload() {
     currentFilename = null;
 
     // Reset visualization
-    originalImage.style.display = 'none';
-    originalContainer.querySelector('.placeholder').style.display = 'flex';
-    maskImage.style.display = 'none';
-    maskContainer.querySelector('.placeholder').style.display = 'flex';
+    if (originalImage && originalContainer) {
+        originalImage.style.display = 'none';
+        originalContainer.querySelector('.placeholder').style.display = 'flex';
+    }
+    if (maskImage && maskContainer) {
+        maskImage.style.display = 'none';
+        maskContainer.querySelector('.placeholder').style.display = 'flex';
+    }
 
     // Reset results
     hideResults();
 }
-
-// ============================================
-// Slider Controls
-// ============================================
-
-gammaSlider.addEventListener('input', () => {
-    gammaValue.textContent = gammaSlider.value;
-});
-
-kSlider.addEventListener('input', () => {
-    kValue.textContent = kSlider.value;
-});
 
 // ============================================
 // Processing
@@ -158,7 +134,6 @@ kSlider.addEventListener('input', () => {
 processBtn.addEventListener('click', async () => {
     if (!currentFilename) return;
 
-    // Show loading state
     setProcessing(true);
 
     try {
@@ -168,22 +143,56 @@ processBtn.addEventListener('click', async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                filename: currentFilename,
-                gamma: parseFloat(gammaSlider.value),
-                k_value: parseInt(kSlider.value)
+                filename: currentFilename
             })
         });
 
         const data = await response.json();
 
         if (data.success) {
-            // Show processed mask
-            showProcessedMask(data.mask_path);
+            // Show mask (Overlay preference for better visual)
+            if (maskImage && maskContainer) {
+                maskImage.src = (data.overlay_path || data.mask_path) + '?' + Date.now();
+                maskImage.style.display = 'block';
+                maskContainer.querySelector('.placeholder').style.display = 'none';
+            }
+
+            // PIPELINE VISUALIZATION (Modal Popup)
+            const toggleBtn = document.getElementById('toggle-pipeline-btn');
+            const modal = document.getElementById('pipeline-modal');
+            const closeBtn = document.querySelector('.close-modal');
+
+            if (data.pipeline && toggleBtn && modal) {
+                toggleBtn.style.display = 'inline-block';
+
+                // Populate step images
+                if (document.getElementById('step-gamma')) document.getElementById('step-gamma').src = data.pipeline.gamma;
+                if (document.getElementById('step-lab')) document.getElementById('step-lab').src = data.pipeline.lab;
+                if (document.getElementById('step-kmeans')) document.getElementById('step-kmeans').src = data.pipeline.kmeans;
+                if (document.getElementById('step-morph')) document.getElementById('step-morph').src = data.pipeline.morphology;
+
+                // Open Modal
+                toggleBtn.onclick = function () {
+                    modal.style.display = "flex";
+                }
+
+                // Close Modal
+                closeBtn.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+                // Close if clicked outside
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            }
 
             // Show results
             showResults(data);
         } else {
-            alert('Processing failed: ' + data.error);
+            alert('Processing failed: ' + (data.error || 'Unknown error'));
         }
     } catch (error) {
         console.error('Processing error:', error);
@@ -193,7 +202,6 @@ processBtn.addEventListener('click', async () => {
     }
 });
 
-// Set processing state
 function setProcessing(isProcessing) {
     const btnText = processBtn.querySelector('.btn-text');
     const btnLoader = processBtn.querySelector('.btn-loader');
@@ -202,44 +210,11 @@ function setProcessing(isProcessing) {
         btnText.textContent = 'Processing...';
         btnLoader.style.display = 'block';
         processBtn.disabled = true;
-        processingSteps.style.display = 'flex';
-        animateProcessingSteps();
     } else {
         btnText.textContent = 'Process Image';
         btnLoader.style.display = 'none';
         processBtn.disabled = false;
     }
-}
-
-// Animate processing steps
-function animateProcessingSteps() {
-    const steps = processingSteps.querySelectorAll('.step');
-    let currentStep = 0;
-
-    const interval = setInterval(() => {
-        steps.forEach((step, index) => {
-            step.classList.remove('active', 'completed');
-            if (index < currentStep) {
-                step.classList.add('completed');
-            } else if (index === currentStep) {
-                step.classList.add('active');
-            }
-        });
-
-        currentStep++;
-
-        if (currentStep > steps.length) {
-            clearInterval(interval);
-            steps.forEach(step => step.classList.add('completed'));
-        }
-    }, 400);
-}
-
-// Show processed mask
-function showProcessedMask(filepath) {
-    maskImage.src = filepath + '?' + Date.now(); // Cache bust
-    maskImage.style.display = 'block';
-    maskContainer.querySelector('.placeholder').style.display = 'none';
 }
 
 // ============================================
@@ -250,27 +225,67 @@ function showResults(data) {
     // Hide empty state
     emptyState.style.display = 'none';
 
-    // Show classification
+    // Show classification with confidence
     classificationResult.style.display = 'block';
     classificationBadge.className = 'classification-badge ' + data.classification_class;
-    classificationText.textContent = data.classification;
+
+    if (data.confidence && data.confidence > 0) {
+        classificationText.textContent = data.classification + ' (' + data.confidence.toFixed(1) + '%)';
+    } else {
+        classificationText.textContent = data.classification;
+    }
 
     // Update attributes table
     document.getElementById('attr-compactness').textContent = data.features.compactness;
     document.getElementById('attr-smoothness').textContent = data.features.smoothness;
     document.getElementById('attr-mean-hue').textContent = data.features.mean_hue + '°';
 
-    // Show parameters
+    // Show method used
     parametersSection.style.display = 'block';
-    document.getElementById('param-gamma').textContent = data.parameters.gamma;
-    document.getElementById('param-k').textContent = data.parameters.k_value;
+
+    const methodElement = document.getElementById('method-used');
+    if (methodElement && data.method_used) {
+        methodElement.textContent = data.method_used;
+        methodElement.className = 'method-badge ' + (data.method_used.includes('K-Means') ? 'primary' : 'fallback');
+    }
+
+    // Show method reference section below images
+    const methodReference = document.getElementById('method-reference');
+    const pipelineMethod = document.getElementById('pipeline-method');
+    const referenceDetails = document.getElementById('reference-details');
+
+    if (methodReference && data.method_used) {
+        methodReference.style.display = 'block';
+        pipelineMethod.textContent = data.method_used;
+
+        if (data.method_used.includes('K-Means')) {
+            pipelineMethod.className = 'method-badge primary';
+            referenceDetails.textContent = 'Primary: K-Means Clustering (Proposed Method)';
+        } else if (data.method_used.includes('Hybrid')) {
+            pipelineMethod.className = 'method-badge primary';
+            referenceDetails.textContent = 'Hybrid Strategy: AI (Prediction) + K-Means (Analysis)';
+        } else {
+            pipelineMethod.className = 'method-badge fallback';
+            referenceDetails.textContent = 'K-Means failed (Empty Mask). Switched to AI Fallback (rembg).';
+        }
+    }
 }
 
 function hideResults() {
     emptyState.style.display = 'flex';
     classificationResult.style.display = 'none';
     parametersSection.style.display = 'none';
-    processingSteps.style.display = 'none';
+
+    const methodReference = document.getElementById('method-reference');
+    if (methodReference) {
+        methodReference.style.display = 'none';
+    }
+
+    // Hide pipeline toggle and grid
+    const toggleBtn = document.getElementById('toggle-pipeline-btn');
+    const pipelineDiv = document.getElementById('pipeline-steps');
+    if (toggleBtn) toggleBtn.style.display = 'none';
+    if (pipelineDiv) pipelineDiv.style.display = 'none';
 
     // Reset attributes
     document.getElementById('attr-compactness').textContent = '--';
@@ -282,4 +297,6 @@ function hideResults() {
 // Initialize
 // ============================================
 
-console.log('MusangKing Classification System loaded');
+console.log('MusangKing Hybrid System');
+console.log('Varieties: Musang King, Black Thorn, Udang Merah');
+console.log('Ripeness: Mature, Immature, Defective');

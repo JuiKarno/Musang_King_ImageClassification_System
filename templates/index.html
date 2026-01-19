@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MusangKing Classification System</title>
     <meta name="description"
-        content="Professional durian classification system using computer vision - Musang King vs D24 detection">
+        content="Professional durian classification system using computer vision - Musang King, Black Thorn, Udang Merah detection">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -27,15 +27,15 @@
 
             <!-- Center: Navigation -->
             <nav class="header-nav">
-                <a href="#" class="nav-link active">Dashboard</a>
-                <a href="#" class="nav-link">Datasets</a>
-                <a href="#" class="nav-link">Documentation</a>
-                <a href="#" class="nav-link">About Project</a>
+                <a href="{{ url_for('index') }}" class="nav-link active">Dashboard</a>
+                <a href="{{ url_for('datasets') }}" class="nav-link">Datasets</a>
+                <a href="{{ url_for('documentation') }}" class="nav-link">Documentation</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About Project</a>
             </nav>
 
             <!-- Right: Status -->
             <div class="header-actions">
-                <div class="version-badge">v1.0.0</div>
+                <div class="version-badge">v2.0 Hybrid</div>
             </div>
         </header>
 
@@ -63,24 +63,18 @@
                         </div>
                     </div>
 
-                    <!-- Parameter Controls -->
+                    <!-- Info Section -->
                     <div class="controls-section">
-                        <h3>Processing Parameters</h3>
-
-                        <div class="slider-control">
-                            <label for="gamma-slider">
-                                Gamma Correction
-                                <span class="slider-value" id="gamma-value">1.0</span>
-                            </label>
-                            <input type="range" id="gamma-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <h3>Supported Classifications</h3>
+                        <div class="info-tags">
+                            <span class="info-tag variety">🍃 Musang King</span>
+                            <span class="info-tag variety">🖤 Black Thorn</span>
+                            <span class="info-tag variety">🦐 Udang Merah</span>
                         </div>
-
-                        <div class="slider-control">
-                            <label for="k-slider">
-                                K-Means Clusters (K)
-                                <span class="slider-value" id="k-value">3</span>
-                            </label>
-                            <input type="range" id="k-slider" min="2" max="6" step="1" value="3">
+                        <div class="info-tags" style="margin-top: 0.5rem;">
+                            <span class="info-tag ripeness">🟢 Mature</span>
+                            <span class="info-tag ripeness">🟡 Immature</span>
+                            <span class="info-tag ripeness">🔴 Defective</span>
                         </div>
                     </div>
 
@@ -95,7 +89,7 @@
             <!-- Visualization Panel (Center) -->
             <section class="panel visualization-panel" id="visualization-panel">
                 <div class="panel-header">
-                    <h2>Visualization</h2>
+                    <h2>Segmentation Result</h2>
                     <span class="panel-icon">🖼️</span>
                 </div>
 
@@ -106,7 +100,7 @@
                             <div class="image-container" id="original-container">
                                 <div class="placeholder">
                                     <span>📤</span>
-                                    <p>Upload an image to begin</p>
+                                    <p>Upload an image</p>
                                 </div>
                                 <img id="original-image" src="" alt="Original" style="display: none;">
                             </div>
@@ -117,34 +111,61 @@
                         </div>
 
                         <div class="image-box">
-                            <h4>Processed Mask</h4>
+                            <h4>Segmented Result</h4>
                             <div class="image-container" id="mask-container">
                                 <div class="placeholder">
                                     <span>🔬</span>
-                                    <p>Click Process to see results</p>
+                                    <p>Click Process</p>
                                 </div>
-                                <img id="mask-image" src="" alt="Processed Mask" style="display: none;">
+                                <img id="mask-image" src="" alt="Segmented Mask" style="display: none;">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Processing Steps Indicator -->
-                    <div class="processing-steps" id="processing-steps" style="display: none;">
-                        <div class="step" data-step="1">
-                            <span class="step-number">1</span>
-                            <span class="step-name">Preprocessing</span>
+                    <!-- Pipeline Toggle -->
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary btn-sm" id="toggle-pipeline-btn" style="display: none;">
+                            👁️ View Processing Stages
+                        </button>
+                    </div>
+
+                    <!-- Pipeline Modal (Popup) -->
+                    <div id="pipeline-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <h3 style="text-align: center; color: var(--primary-dark); margin-bottom: 1.5rem;">Image
+                                Processing Pipeline (K-Means)</h3>
+
+                            <div class="pipeline-grid">
+                                <div class="step-card">
+                                    <span class="step-label">1. Gamma Correction</span>
+                                    <img id="step-gamma" src="" alt="Gamma">
+                                </div>
+                                <div class="step-card">
+                                    <span class="step-label">2. LAB Color Space</span>
+                                    <img id="step-lab" src="" alt="LAB">
+                                </div>
+                                <div class="step-card">
+                                    <span class="step-label">3. K-Means (Clustering)</span>
+                                    <img id="step-kmeans" src="" alt="K-Means">
+                                </div>
+                                <div class="step-card">
+                                    <span class="step-label">4. Morphology (Cleanup)</span>
+                                    <img id="step-morph" src="" alt="Morphology">
+                                </div>
+                            </div>
                         </div>
-                        <div class="step" data-step="2">
-                            <span class="step-number">2</span>
-                            <span class="step-name">Segmentation</span>
+                    </div>
+
+                    <!-- Method Reference Section -->
+                    <div class="method-reference" id="method-reference" style="display: none;">
+                        <div class="reference-label">📚 Segmentation Method Used:</div>
+                        <div class="reference-badge-container">
+                            <span class="method-badge primary" id="pipeline-method">Standard (K-Means)</span>
                         </div>
-                        <div class="step" data-step="3">
-                            <span class="step-number">3</span>
-                            <span class="step-name">Refinement</span>
-                        </div>
-                        <div class="step" data-step="4">
-                            <span class="step-number">4</span>
-                            <span class="step-name">Extraction</span>
+                        <div class="reference-details" id="reference-details">
+                            Using traditional image processing: Gamma Correction → K-Means Clustering → Morphological
+                            Operations
                         </div>
                     </div>
                 </div>
@@ -202,12 +223,11 @@
                         </table>
                     </div>
 
-                    <!-- Parameters Used -->
+                    <!-- Method Used -->
                     <div class="parameters-section" id="parameters-section" style="display: none;">
-                        <h3>Parameters Used</h3>
-                        <div class="param-tags">
-                            <span class="param-tag">Gamma: <strong id="param-gamma">--</strong></span>
-                            <span class="param-tag">K: <strong id="param-k">--</strong></span>
+                        <h3>Segmentation Method</h3>
+                        <div class="method-section">
+                            <span class="method-badge primary" id="method-used">Standard (K-Means)</span>
                         </div>
                     </div>
 

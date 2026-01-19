@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datasets - MusangKing System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dataset-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border: 1px solid var(--primary-pale);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .distribution-bar {
+            height: 24px;
+            background: #eee;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            margin: 2rem 0;
+        }
+
+        .bar-segment {
+            height: 100%;
+            transition: width 1s ease-in-out;
+            position: relative;
+        }
+
+        .bar-segment:hover::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .class-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-pale) 0%, white 100%);
+            border-bottom: 1px solid var(--primary-pale);
+        }
+
+        .class-header h3 {
+            margin: 0;
+            color: var(--primary-dark);
+        }
+
+        .class-body {
+            padding: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li::before {
+            content: "•";
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .data-source {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}"
+                    style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{{ url_for('static', filename='images/MK_LOGO.png') }}" alt="MusangKing Logo"
+                        class="logo-image">
+                    <div class="brand-info">
+                        <span class="app-name">MusangKing</span>
+                        <span class="subtitle">Classification System</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="header-nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('datasets') }}" class="nav-link active">Datasets</a>
+                <a href="{{ url_for('documentation') }}" class="nav-link">Documentation</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About Project</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="version-badge">v2.0 Hybrid</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard" style="display: block; max-width: 1200px; margin: 0 auto; padding: 2rem;">
+
+            <section class="panel" style="padding: 2rem;">
+                <h1 style="color: var(--primary-dark); margin-bottom: 1rem;">Dataset Overview</h1>
+                <p style="color: var(--text-secondary);">The model was trained on a curated dataset of durian images
+                    collected from local orchards and online repositories.</p>
+
+                <!-- Dataset Statistics -->
+                <div class="dataset-stats" style="margin-top: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-number">300+</div>
+                        <div class="stat-label">Total Images</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Varieties</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">96.5%</div>
+                        <div class="stat-label">Model Accuracy</div>
+                    </div>
+                </div>
+
+                <h3>Class Distribution</h3>
+                <div class="distribution-bar">
+                    <div class="bar-segment" style="width: 35%; background: #FFC107;" data-count="Musang King"
+                        title="Musang King (35%)"></div>
+                    <div class="bar-segment" style="width: 30%; background: #5D4037;" data-count="Black Thorn"
+                        title="Black Thorn (30%)"></div>
+                    <div class="bar-segment" style="width: 35%; background: #FF5722;" data-count="Udang Merah"
+                        title="Udang Merah (35%)"></div>
+                </div>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary);">
+                    <span style="display: flex; align-items: center; gap: 5px;"><span
+                            style="width: 10px; height: 10px; background: #FFC107; display: inline-block; border-radius: 50%;"></span>
+                        Musang King</span>
+                    <span style="display: flex; align-items: center; gap: 5px;"><span
+                            style="width: 10px; height: 10px; background: #5D4037; display: inline-block; border-radius: 50%;"></span>
+                        Black Thorn</span>
+                    <span style="display: flex; align-items: center; gap: 5px;"><span
+                            style="width: 10px; height: 10px; background: #FF5722; display: inline-block; border-radius: 50%;"></span>
+                        Udang Merah</span>
+                </div>
+
+                <div class="class-grid">
+                    <!-- Musang King -->
+                    <div class="class-card">
+                        <div class="class-header">
+                            <h3>👑 Musang King (D197)</h3>
+                        </div>
+                        <div class="class-body">
+                            <p>Most popular variety. Known for its distinct star shape at the bottom and golden yellow
+                                flesh.</p>
+                            <ul class="feature-list">
+                                <li><strong>Shape:</strong> Oval to Ellipsoid</li>
+                                <li><strong>Thorn:</strong> Pyramidal, widely spaced</li>
+                                <li><strong>Base:</strong> Star-shaped bald patch</li>
+                                <li><strong>Color:</strong> Greenish-brown husk</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Black Thorn -->
+                    <div class="class-card">
+                        <div class="class-header">
+                            <h3>🖤 Black Thorn (D200)</h3>
+                        </div>
+                        <div class="class-body">
+                            <p>Premium variety known for the dark thorn tip at the bottom and reddish-orange flesh.</p>
+                            <ul class="feature-list">
+                                <li><strong>Shape:</strong> Round to Pumelo-like</li>
+                                <li><strong>Thorn:</strong> Tiny, dark-tipped ("Black Thorn")</li>
+                                <li><strong>Base:</strong> Distinctive black tip</li>
+                                <li><strong>Color:</strong> Greyish-green husk</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Udang Merah -->
+                    <div class="class-card">
+                        <div class="class-header">
+                            <h3>🦐 Udang Merah (D175)</h3>
+                        </div>
+                        <div class="class-body">
+                            <p>Local favorite ("Red Prawn"). Known for curved shape and pinkish-orange flesh.</p>
+                            <ul class="feature-list">
+                                <li><strong>Shape:</strong> Elongated, slightly football-like</li>
+                                <li><strong>Thorn:</strong> Short and sparse</li>
+                                <li><strong>Base:</strong> Indented</li>
+                                <li><strong>Color:</strong> Brownish-green husk</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-source">
+                    <strong>📂 Data Source & Augmentation</strong><br>
+                    <p>The models were trained using datasets from Roboflow Universe:</p>
+                    <ul style="margin-top: 0.5rem; margin-bottom: 1rem;">
+                        <li><a href="https://universe.roboflow.com/durian-cf87w/durian_own/dataset/1"
+                                target="_blank">Durian Own Dataset (Roboflow)</a></li>
+                        <li><a href="https://universe.roboflow.com/carl-bwzge/durian-thesis/dataset/3"
+                                target="_blank">Durian Thesis Dataset (Roboflow)</a></li>
+                    </ul>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">Images were preprocessed using Gaussian
+                        Blur and Gamma Correction. Data augmentation techniques (Rotation, Flip, Zoom) were applied to
+                        increase dataset robustness.</p>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <p>MusangKing Classification System &copy; 2026 | CSC566 Image Processing Project</p>
+        </footer>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - MusangKing System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+
+        .doc-section h2 {
+            border-bottom: 2px solid var(--primary-pale);
+            padding-bottom: 0.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border: 1px solid #eee;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .flow-step strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .method-box {
+            background: #fff;
+            border-left: 5px solid;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .method-primary {
+            border-color: #4CAF50;
+        }
+
+        .method-fallback {
+            border-color: #FF9800;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}"
+                    style="text-decoration: none; display: flex; align-items: center; gap: 1rem;">
+                    <img src="{{ url_for('static', filename='images/MK_LOGO.png') }}" alt="MusangKing Logo"
+                        class="logo-image">
+                    <div class="brand-info">
+                        <span class="app-name">MusangKing</span>
+                        <span class="subtitle">Classification System</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="header-nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('datasets') }}" class="nav-link">Datasets</a>
+                <a href="{{ url_for('documentation') }}" class="nav-link active">Documentation</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About Project</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="version-badge">v2.0 Hybrid</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard" style="display: block; max-width: 1200px; margin: 0 auto; padding: 2rem;">
+
+            <div class="panel" style="padding: 2.5rem;">
+                <h1 style="margin-bottom: 2rem; color: var(--primary-dark);">System Documentation</h1>
+
+                <!-- 1. Overview Diagram -->
+                <div class="doc-section">
+                    <h2>1. System Pipeline</h2>
+                    <p>The system follows a standard image processing pipeline enhanced with a hybrid segmentation
+                        strategy.</p>
+
+                    <div class="pipeline-flow">
+                        <div class="flow-step">
+                            <strong>Input</strong>
+                            <span>Image Upload</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <strong>Preprocessing</strong>
+                            <span>Gamma & Resize</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <strong>Segmentation</strong>
+                            <span>Hybrid (K-Means/AI)</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <strong>Features</strong>
+                            <span>Extraction</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <strong>Classification</strong>
+                            <span>XGBoost/SVM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Hybrid Segmentation -->
+                <div class="doc-section">
+                    <h2>2. Hybrid Segmentation Strategy (Smart Logic)</h2>
+                    <p>To meet academic requirements while ensuring robustness, we implemented a dual-method approach:
+                    </p>
+
+                    <div class="method-box method-primary">
+                        <h3>Method A: Traditional K-Means (Primary)</h3>
+                        <p>Standard color clustering using CIE LAB color space. This is the default method used for
+                            clear images.</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                            <li>Converts image to LAB color space</li>
+                            <li>Applies K-Means clustering (K=2 or 3)</li>
+                            <li>Selects the center cluster as the fruit object</li>
+                        </ul>
+                    </div>
+
+                    <div class="method-box method-fallback">
+                        <h3>Method B: AI Fallback (rembg)</h3>
+                        <p>Triggered automatically if K-Means fails (e.g., detects < 5% fruit area).</p>
+                                <p>Uses a deep learning model (U-2 Net) to precisely remove the background in
+                                    challenging lighting conditions.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Feature Extraction -->
+                <div class="doc-section">
+                    <h2>3. Feature Extraction (Phase 4)</h2>
+                    <p>We extract 5 key features for variety classification and 3 for ripeness:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                        <thead>
+                            <tr style="background: var(--primary-pale); text-align: left;">
+                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Feature Name
+                                </th>
+                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Description
+                                </th>
+                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Used For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Compactness</strong>
+                                </td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">(Perimeter²) / Area. Measures
+                                    shape irregularity.</td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety & Ripeness</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Mean Red</strong></td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Average Red channel intensity.
+                                </td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety (Flesh color)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Mean Hue</strong></td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Average color tone (HSV).</td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Ripeness</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Aspect Ratio</strong>
+                                </td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Width / Height ratio of
+                                    bounding box.</td>
+                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>MusangKing Classification System &copy; 2026 | CSC566 Image Processing Project</p>
+        </footer>
+    </div>
+</body>
+
+</html>
