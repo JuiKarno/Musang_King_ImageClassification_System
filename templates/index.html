@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusangKing Classification System</title>
+    <meta name="description" content="Professional durian classification system using computer vision - Musang King vs D24 detection">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🍈</span>
+                <h1>MusangKing Classifier</h1>
+            </div>
+            <p class="subtitle">Durian Image Processing & Classification System</p>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <!-- Control Panel (Left) -->
+            <section class="panel control-panel" id="control-panel">
+                <div class="panel-header">
+                    <h2>Control Panel</h2>
+                    <span class="panel-icon">⚙️</span>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Upload Section -->
+                    <div class="upload-section">
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-icon">📷</div>
+                            <p>Drag & Drop Image</p>
+                            <span>or click to browse</span>
+                            <input type="file" id="image-input" accept="image/*" hidden>
+                        </div>
+                        <div class="upload-preview" id="upload-preview" style="display: none;">
+                            <img id="preview-image" src="" alt="Preview">
+                            <button class="btn btn-secondary" id="clear-btn">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Parameter Controls -->
+                    <div class="controls-section">
+                        <h3>Processing Parameters</h3>
+                        
+                        <div class="slider-control">
+                            <label for="gamma-slider">
+                                Gamma Correction
+                                <span class="slider-value" id="gamma-value">1.0</span>
+                            </label>
+                            <input type="range" id="gamma-slider" min="0.5" max="2.0" step="0.1" value="1.0">
+                        </div>
+                        
+                        <div class="slider-control">
+                            <label for="k-slider">
+                                K-Means Clusters (K)
+                                <span class="slider-value" id="k-value">3</span>
+                            </label>
+                            <input type="range" id="k-slider" min="2" max="6" step="1" value="3">
+                        </div>
+                    </div>
+
+                    <!-- Process Button -->
+                    <button class="btn btn-primary btn-process" id="process-btn" disabled>
+                        <span class="btn-text">Process Image</span>
+                        <span class="btn-loader" style="display: none;"></span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Visualization Panel (Center) -->
+            <section class="panel visualization-panel" id="visualization-panel">
+                <div class="panel-header">
+                    <h2>Visualization</h2>
+                    <span class="panel-icon">🖼️</span>
+                </div>
+                
+                <div class="panel-content">
+                    <div class="image-comparison">
+                        <div class="image-box">
+                            <h4>Original Image</h4>
+                            <div class="image-container" id="original-container">
+                                <div class="placeholder">
+                                    <span>📤</span>
+                                    <p>Upload an image to begin</p>
+                                </div>
+                                <img id="original-image" src="" alt="Original" style="display: none;">
+                            </div>
+                        </div>
+                        
+                        <div class="image-divider">
+                            <span class="divider-arrow">→</span>
+                        </div>
+                        
+                        <div class="image-box">
+                            <h4>Processed Mask</h4>
+                            <div class="image-container" id="mask-container">
+                                <div class="placeholder">
+                                    <span>🔬</span>
+                                    <p>Click Process to see results</p>
+                                </div>
+                                <img id="mask-image" src="" alt="Processed Mask" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Processing Steps Indicator -->
+                    <div class="processing-steps" id="processing-steps" style="display: none;">
+                        <div class="step" data-step="1">
+                            <span class="step-number">1</span>
+                            <span class="step-name">Preprocessing</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <span class="step-number">2</span>
+                            <span class="step-name">Segmentation</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <span class="step-number">3</span>
+                            <span class="step-name">Refinement</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <span class="step-number">4</span>
+                            <span class="step-name">Extraction</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Panel (Right) -->
+            <section class="panel results-panel" id="results-panel">
+                <div class="panel-header">
+                    <h2>Analysis Results</h2>
+                    <span class="panel-icon">📊</span>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Classification Result -->
+                    <div class="classification-result" id="classification-result" style="display: none;">
+                        <div class="classification-badge" id="classification-badge">
+                            <span class="badge-icon">🏆</span>
+                            <span class="badge-text" id="classification-text">--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Attributes Table -->
+                    <div class="attributes-section">
+                        <h3>Feature Attributes</h3>
+                        <table class="attributes-table" id="attributes-table">
+                            <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span class="attr-icon">⭕</span>
+                                        Compactness
+                                    </td>
+                                    <td id="attr-compactness">--</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="attr-icon">〰️</span>
+                                        Smoothness
+                                    </td>
+                                    <td id="attr-smoothness">--</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="attr-icon">🎨</span>
+                                        Mean Hue
+                                    </td>
+                                    <td id="attr-mean-hue">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Parameters Used -->
+                    <div class="parameters-section" id="parameters-section" style="display: none;">
+                        <h3>Parameters Used</h3>
+                        <div class="param-tags">
+                            <span class="param-tag">Gamma: <strong id="param-gamma">--</strong></span>
+                            <span class="param-tag">K: <strong id="param-k">--</strong></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div class="empty-state" id="empty-state">
+                        <span class="empty-icon">📋</span>
+                        <p>Upload and process an image to see analysis results</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>MusangKing Classification System &copy; 2026 | CSC566 Image Processing Project</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
