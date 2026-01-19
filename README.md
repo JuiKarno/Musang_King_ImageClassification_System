@@ -2,7 +2,7 @@
 
 A professional Flask-based web application for durian (Musang King vs D24) classification using computer vision techniques.
 
-![Dashboard Screenshot](static/uploads/screenshot.png)
+
 
 ## 🎯 Features
 
