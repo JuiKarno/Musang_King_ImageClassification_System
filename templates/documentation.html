@@ -23,7 +23,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
             padding: 2rem;
             border-radius: var(--radius-md);
             margin: 2rem 0;
@@ -39,19 +39,30 @@
             text-align: center;
             border: 1px solid #eee;
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
         .flow-step strong {
             display: block;
             color: var(--primary);
             margin-bottom: 0.5rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
+        }
+
+        .flow-step span {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
 
         .flow-arrow {
             font-size: 1.5rem;
-            color: var(--text-secondary);
+            color: var(--primary);
         }
 
         .method-box {
@@ -65,21 +76,126 @@
 
         .method-primary {
             border-color: #4CAF50;
+            background: linear-gradient(135deg, #f1f8e9 0%, white 50%);
         }
 
         .method-fallback {
             border-color: #FF9800;
+            background: linear-gradient(135deg, #fff3e0 0%, white 50%);
+        }
+
+        .method-box h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .method-steps {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+        }
+
+        .method-steps li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .method-steps li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-table thead tr {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .feature-table th,
+        .feature-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature-table th {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .feature-table tbody tr:hover {
+            background: var(--primary-pale);
+        }
+
+        .feature-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--primary-pale);
+        }
+
+        .model-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .model-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .spec-item {
+            background: var(--primary-pale);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--primary-dark);
         }
 
         .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
+            background: #1e1e1e;
+            color: #d4d4d4;
             padding: 1rem;
             border-radius: var(--radius-sm);
-            font-family: 'Consolas', monospace;
-            font-size: 0.9rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
             overflow-x: auto;
             margin: 1rem 0;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        .code-keyword {
+            color: #569cd6;
+        }
+
+        .code-string {
+            color: #ce9178;
         }
     </style>
 </head>
@@ -116,110 +232,167 @@
         <main class="dashboard" style="display: block; max-width: 1200px; margin: 0 auto; padding: 2rem;">
 
             <div class="panel" style="padding: 2.5rem;">
-                <h1 style="margin-bottom: 2rem; color: var(--primary-dark);">System Documentation</h1>
+                <h1 style="margin-bottom: 2rem; color: var(--primary-dark);">📖 System Documentation</h1>
 
                 <!-- 1. Overview Diagram -->
                 <div class="doc-section">
-                    <h2>1. System Pipeline</h2>
-                    <p>The system follows a standard image processing pipeline enhanced with a hybrid segmentation
-                        strategy.</p>
+                    <h2>1. System Pipeline Overview</h2>
+                    <p>The MusangKing Classification System follows a standard image processing pipeline with K-Means
+                        segmentation as the primary method.</p>
 
                     <div class="pipeline-flow">
                         <div class="flow-step">
-                            <strong>Input</strong>
+                            <strong>📤 Input</strong>
                             <span>Image Upload</span>
                         </div>
                         <span class="flow-arrow">→</span>
                         <div class="flow-step">
-                            <strong>Preprocessing</strong>
-                            <span>Gamma & Resize</span>
+                            <strong>🔧 Preprocessing</strong>
+                            <span>Gamma (0.6) & Resize</span>
                         </div>
                         <span class="flow-arrow">→</span>
                         <div class="flow-step">
-                            <strong>Segmentation</strong>
-                            <span>Hybrid (K-Means/AI)</span>
+                            <strong>🎨 Segmentation</strong>
+                            <span>K-Means (K=3)</span>
                         </div>
                         <span class="flow-arrow">→</span>
                         <div class="flow-step">
-                            <strong>Features</strong>
-                            <span>Extraction</span>
+                            <strong>📊 Features</strong>
+                            <span>5 Geometric + Color</span>
                         </div>
                         <span class="flow-arrow">→</span>
                         <div class="flow-step">
-                            <strong>Classification</strong>
-                            <span>XGBoost/SVM</span>
+                            <strong>🤖 Classification</strong>
+                            <span>SMOTE Ensemble</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Hybrid Segmentation -->
+                <!-- 2. Segmentation Strategy -->
                 <div class="doc-section">
-                    <h2>2. Hybrid Segmentation Strategy (Smart Logic)</h2>
-                    <p>To meet academic requirements while ensuring robustness, we implemented a dual-method approach:
-                    </p>
+                    <h2>2. Segmentation Strategy</h2>
+                    <p>The system uses K-Means clustering as the primary segmentation method, with an AI fallback for
+                        challenging images.</p>
 
                     <div class="method-box method-primary">
-                        <h3>Method A: Traditional K-Means (Primary)</h3>
-                        <p>Standard color clustering using CIE LAB color space. This is the default method used for
-                            clear images.</p>
-                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-secondary);">
-                            <li>Converts image to LAB color space</li>
-                            <li>Applies K-Means clustering (K=2 or 3)</li>
-                            <li>Selects the center cluster as the fruit object</li>
+                        <h3>✅ Primary Method: K-Means Clustering</h3>
+                        <p>Standard academic approach using CIE LAB color space for robust color-based segmentation.</p>
+                        <ul class="method-steps">
+                            <li><strong>Gamma Correction (γ=0.6):</strong> Enhance contrast for better cluster
+                                separation</li>
+                            <li><strong>LAB Conversion:</strong> Transform to perceptually uniform color space</li>
+                            <li><strong>K-Means (K=3):</strong> Cluster into Background, Husk, and Flesh regions</li>
+                            <li><strong>Morphological Cleanup:</strong> Remove noise and fill holes</li>
                         </ul>
                     </div>
 
                     <div class="method-box method-fallback">
-                        <h3>Method B: AI Fallback (rembg)</h3>
-                        <p>Triggered automatically if K-Means fails (e.g., detects < 5% fruit area).</p>
-                                <p>Uses a deep learning model (U-2 Net) to precisely remove the background in
-                                    challenging lighting conditions.</p>
+                        <h3>⚠️ Fallback Method: AI Segmentation (rembg)</h3>
+                        <p>Automatically triggered if K-Means produces an empty or <1% area mask.</p>
+                                <ul class="method-steps">
+                                    <li>Uses U-2 Net deep learning model</li>
+                                    <li>Handles complex backgrounds and lighting conditions</li>
+                                    <li>Only activated when K-Means fails completely</li>
+                                </ul>
                     </div>
                 </div>
 
                 <!-- 3. Feature Extraction -->
                 <div class="doc-section">
                     <h2>3. Feature Extraction (Phase 4)</h2>
-                    <p>We extract 5 key features for variety classification and 3 for ripeness:</p>
+                    <p>We extract morphological and color features from the segmented mask for classification:</p>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                    <table class="feature-table">
                         <thead>
-                            <tr style="background: var(--primary-pale); text-align: left;">
-                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Feature Name
-                                </th>
-                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Description
-                                </th>
-                                <th style="padding: 1rem; border-bottom: 2px solid var(--primary-light);">Used For</th>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Formula / Description</th>
+                                <th>Used For</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Compactness</strong>
-                                </td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">(Perimeter²) / Area. Measures
-                                    shape irregularity.</td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety & Ripeness</td>
+                                <td><strong>Compactness</strong></td>
+                                <td>(Perimeter²) / Area — Measures shape irregularity</td>
+                                <td>Variety & Ripeness</td>
                             </tr>
                             <tr>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Mean Red</strong></td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Average Red channel intensity.
-                                </td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety (Flesh color)</td>
+                                <td><strong>Smoothness</strong></td>
+                                <td>Approx. Vertices / Perimeter — Contour complexity</td>
+                                <td>Variety & Ripeness</td>
                             </tr>
                             <tr>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Mean Hue</strong></td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Average color tone (HSV).</td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Ripeness</td>
+                                <td><strong>Aspect Ratio</strong></td>
+                                <td>Width / Height of bounding box</td>
+                                <td>Variety</td>
                             </tr>
                             <tr>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;"><strong>Aspect Ratio</strong>
-                                </td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Width / Height ratio of
-                                    bounding box.</td>
-                                <td style="padding: 1rem; border-bottom: 1px solid #eee;">Variety</td>
+                                <td><strong>Rectangularity</strong></td>
+                                <td>Area / Bounding Box Area</td>
+                                <td>Variety</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mean Red</strong></td>
+                                <td>Average Red channel intensity (BGR)</td>
+                                <td>Variety</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mean Hue</strong></td>
+                                <td>Average Hue value (HSV)</td>
+                                <td>Ripeness</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 4. Classification Models -->
+                <div class="doc-section">
+                    <h2>4. Classification Models</h2>
+                    <p>Two ensemble models trained with SMOTE upsampling for balanced class distribution:</p>
+
+                    <div class="model-card">
+                        <h4>🍈 Variety Classification Model</h4>
+                        <p>Classifies durian into Musang King (D197), Black Thorn (D200), or Udang Merah (D175).</p>
+                        <div class="model-specs">
+                            <span class="spec-item">Ensemble: SVM + RF + XGBoost</span>
+                            <span class="spec-item">Voting: Soft (Probability)</span>
+                            <span class="spec-item">Features: 5</span>
+                            <span class="spec-item">Accuracy: ~96%</span>
+                        </div>
+                    </div>
+
+                    <div class="model-card">
+                        <h4>🌡️ Ripeness Classification Model</h4>
+                        <p>Determines ripeness level: Mature, Immature, or Defective.</p>
+                        <div class="model-specs">
+                            <span class="spec-item">Ensemble: SVM + RF + XGBoost</span>
+                            <span class="spec-item">Voting: Soft (Probability)</span>
+                            <span class="spec-item">Features: 3</span>
+                            <span class="spec-item">Accuracy: ~94%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Security Features -->
+                <div class="doc-section">
+                    <h2>5. Security & Validation</h2>
+                    <p>The system includes a confidence threshold to reject non-durian objects:</p>
+
+                    <div class="code-block">
+                        <span class="code-comment"># Security Check: Is it actually a durian?</span><br>
+                        <span class="code-keyword">CONFIDENCE_THRESHOLD</span> = <span
+                            class="code-string">40.0</span><br><br>
+                        <span class="code-keyword">if</span> v_conf < CONFIDENCE_THRESHOLD:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span
+                                class="code-string">"Unknown Object / Not Durian"</span>, <span
+                                class="code-string">"unknown"</span>, v_conf
+                    </div>
+
+                    <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <strong>Logic:</strong> If the highest prediction probability is below 40%, the object is
+                        unlikely to be a durian from our training set. The system gracefully rejects it instead of
+                        making an incorrect classification.
+                    </p>
                 </div>
 
             </div>

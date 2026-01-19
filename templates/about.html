@@ -24,40 +24,70 @@
         .about-header p {
             color: var(--text-secondary);
             font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
+        /* 4 members in one row */
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
             margin-top: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .member-card {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-sm);
             text-align: center;
             border-top: 4px solid var(--primary);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .member-card:hover {
             transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
 
         .member-avatar {
-            width: 100px;
-            height: 100px;
-            background: #eee;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             margin: 0 auto 1rem;
+            overflow: hidden;
+            border: 4px solid var(--primary-pale);
+            background: #eee;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .member-avatar-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--text-secondary);
+            background: linear-gradient(135deg, var(--primary-pale) 0%, #eee 100%);
         }
 
         .member-role {
@@ -66,13 +96,13 @@
             color: var(--primary-dark);
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
             font-weight: 500;
         }
 
         .member-name {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
             color: var(--text-primary);
@@ -80,7 +110,7 @@
 
         .member-id {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .tech-stack {
@@ -101,6 +131,39 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .objective-item {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .objective-item:hover {
+            background: var(--primary-pale);
+            transform: translateX(5px);
+        }
+
+        .supervisor-section {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .supervisor-section h3 {
+            color: #e65100;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
@@ -142,82 +205,98 @@
                     K-Means Clustering and Morphological Feature Extraction</p>
                 <div style="margin-top: 1rem;">
                     <span class="version-badge" style="background: var(--primary); color: white;">CSC566 | Oct 2025 –
-                        Mac 2026</span>
+                        Mar 2026</span>
                 </div>
             </div>
 
-            <section class="panel" style="padding: 2.5rem; margin-bottom: 3rem;">
-                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-dark);">Group MusangKing Team
+            <section class="panel" style="padding: 2.5rem; margin-bottom: 2rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-dark);">👥 Group MusangKing
+                    Team
                 </h2>
 
+                <!-- 4 members in one row -->
                 <div class="team-grid">
-                    <!-- Member 1 -->
+                    <!-- Member 1: Yazid -->
                     <div class="member-card">
-                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-avatar">
+                            <img src="{{ url_for('static', filename='images/YAZID ZAQWAN.jpg') }}" alt="Yazid Zaqwan">
+                        </div>
                         <span class="member-role">Group Member</span>
                         <h3 class="member-name">Yazid Zaqwan Hakim</h3>
-                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Yusop Zaki</p>
-                        <p class="member-id">ID: 2024977637</p>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0.25rem 0;">Bin Yusop Zaki
+                        </p>
+                        <p class="member-id">2024977637</p>
                     </div>
 
-                    <!-- Member 2 -->
+                    <!-- Member 2: Zulkarnain -->
                     <div class="member-card">
-                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-avatar">
+                            <img src="{{ url_for('static', filename='images/ZUL.jpeg') }}" alt="Muhamad Zulkarnain">
+                        </div>
                         <span class="member-role">Group Member</span>
-                        <h3 class="member-name">Muhamd Zulkarnain</h3>
-                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Samsudin</p>
-                        <p class="member-id">ID: 2024793133</p>
+                        <h3 class="member-name">Muhamad Zulkarnain</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0.25rem 0;">Bin Samsudin</p>
+                        <p class="member-id">2024793133</p>
                     </div>
 
-                    <!-- Member 3 -->
+                    <!-- Member 3: Amirul Fareez -->
                     <div class="member-card">
-                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-avatar">
+                            <img src="{{ url_for('static', filename='images/AMIRUL FAREEZ.jpeg') }}"
+                                alt="Amirul Fareez">
+                        </div>
                         <span class="member-role">Group Member</span>
-                        <h3 class="member-name">Amirul Fariz</h3>
-                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Zahari</p>
-                        <p class="member-id">ID: 2024745641</p>
+                        <h3 class="member-name">Amirul Fareez</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0.25rem 0;">Bin Zahari</p>
+                        <p class="member-id">2024745641</p>
                     </div>
 
-                    <!-- Member 4 -->
+                    <!-- Member 4: Bukhari -->
                     <div class="member-card">
-                        <div class="member-avatar">👨‍💻</div>
+                        <div class="member-avatar">
+                            <img src="{{ url_for('static', filename='images/BUKHARI.jpeg') }}" alt="Mohamad Bukhari">
+                        </div>
                         <span class="member-role">Group Member</span>
                         <h3 class="member-name">Mohamad Bukhari</h3>
-                        <p class="member-name" style="font-size: 1rem; font-weight: normal;">Bin Ahmad Huzairi</p>
-                        <p class="member-id">ID: 2024916761</p>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0.25rem 0;">Bin Ahmad Huzairi
+                        </p>
+                        <p class="member-id">2024916761</p>
                     </div>
                 </div>
 
+                <!-- Supervisor Section -->
+                <div class="supervisor-section">
+                    <h3>📚 Project Supervisor</h3>
+                    <p style="font-size: 1.1rem; font-weight: 600; color: #bf360c;">Dr. Zaaba Ahmad</p>
+                    <p style="color: #8d6e63; font-size: 0.9rem;">Faculty of Computer & Mathematical Sciences, UiTM</p>
+                </div>
+
                 <!-- Objectives -->
-                <div style="margin-top: 4rem;">
+                <div style="margin-top: 3rem;">
                     <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">🎯 Project Objectives</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li
-                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
-                            <strong>1. Variety Classification:</strong> To accurately distinguish between Musang King,
-                            Black Thorn, and Udang Merah using external features.
-                        </li>
-                        <li
-                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
-                            <strong>2. Ripeness Detection:</strong> To classify fruit ripeness into Mature, Immature,
-                            and Defective categories.
-                        </li>
-                        <li
-                            style="background: #f8f9fa; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border-left: 4px solid var(--primary);">
-                            <strong>3. Hybrid Segmentation:</strong> To evaluate and implement a hybrid approach
-                            combining traditional K-Means clustering with modern AI fallback for robust object
-                            detection.
-                        </li>
-                    </ul>
+
+                    <div class="objective-item">
+                        <strong>1. Variety Classification:</strong> To accurately distinguish between Musang King,
+                        Black Thorn, and Udang Merah using external husk features.
+                    </div>
+                    <div class="objective-item">
+                        <strong>2. Ripeness Detection:</strong> To classify fruit ripeness into Mature, Immature,
+                        and Defective categories based on color and texture analysis.
+                    </div>
+                    <div class="objective-item">
+                        <strong>3. K-Means Segmentation:</strong> To implement and evaluate a K-Means clustering
+                        approach for object segmentation in LAB color space.
+                    </div>
                 </div>
 
                 <!-- Tech Stack -->
                 <div class="tech-stack">
-                    <span class="tech-badge">🐍 Python</span>
+                    <span class="tech-badge">🐍 Python 3.10</span>
                     <span class="tech-badge">🌶️ Flask</span>
                     <span class="tech-badge">👁️ OpenCV</span>
                     <span class="tech-badge">🤖 XGBoost</span>
                     <span class="tech-badge">📉 Scikit-Learn</span>
+                    <span class="tech-badge">⚖️ SMOTE</span>
                 </div>
             </section>
 
