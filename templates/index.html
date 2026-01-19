@@ -1,22 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MusangKing Classification System</title>
-    <meta name="description" content="Professional durian classification system using computer vision - Musang King vs D24 detection">
+    <meta name="description"
+        content="Professional durian classification system using computer vision - Musang King vs D24 detection">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Header -->
         <header class="header">
+            <!-- Left: Brand -->
             <div class="logo">
-                <span class="logo-icon">🍈</span>
-                <h1>MusangKing Classifier</h1>
+                <img src="{{ url_for('static', filename='images/MK_LOGO.png') }}" alt="MusangKing Logo"
+                    class="logo-image">
+                <div class="brand-info">
+                    <span class="app-name">MusangKing</span>
+                    <span class="subtitle">Classification System</span>
+                </div>
             </div>
-            <p class="subtitle">Durian Image Processing & Classification System</p>
+
+            <!-- Center: Navigation -->
+            <nav class="header-nav">
+                <a href="#" class="nav-link active">Dashboard</a>
+                <a href="#" class="nav-link">Datasets</a>
+                <a href="#" class="nav-link">Documentation</a>
+                <a href="#" class="nav-link">About Project</a>
+            </nav>
+
+            <!-- Right: Status -->
+            <div class="header-actions">
+                <div class="version-badge">v1.0.0</div>
+            </div>
         </header>
 
         <!-- Main Dashboard -->
@@ -27,7 +47,7 @@
                     <h2>Control Panel</h2>
                     <span class="panel-icon">⚙️</span>
                 </div>
-                
+
                 <div class="panel-content">
                     <!-- Upload Section -->
                     <div class="upload-section">
@@ -46,7 +66,7 @@
                     <!-- Parameter Controls -->
                     <div class="controls-section">
                         <h3>Processing Parameters</h3>
-                        
+
                         <div class="slider-control">
                             <label for="gamma-slider">
                                 Gamma Correction
@@ -54,7 +74,7 @@
                             </label>
                             <input type="range" id="gamma-slider" min="0.5" max="2.0" step="0.1" value="1.0">
                         </div>
-                        
+
                         <div class="slider-control">
                             <label for="k-slider">
                                 K-Means Clusters (K)
@@ -78,7 +98,7 @@
                     <h2>Visualization</h2>
                     <span class="panel-icon">🖼️</span>
                 </div>
-                
+
                 <div class="panel-content">
                     <div class="image-comparison">
                         <div class="image-box">
@@ -91,11 +111,11 @@
                                 <img id="original-image" src="" alt="Original" style="display: none;">
                             </div>
                         </div>
-                        
+
                         <div class="image-divider">
                             <span class="divider-arrow">→</span>
                         </div>
-                        
+
                         <div class="image-box">
                             <h4>Processed Mask</h4>
                             <div class="image-container" id="mask-container">
@@ -107,7 +127,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Processing Steps Indicator -->
                     <div class="processing-steps" id="processing-steps" style="display: none;">
                         <div class="step" data-step="1">
@@ -136,7 +156,7 @@
                     <h2>Analysis Results</h2>
                     <span class="panel-icon">📊</span>
                 </div>
-                
+
                 <div class="panel-content">
                     <!-- Classification Result -->
                     <div class="classification-result" id="classification-result" style="display: none;">
@@ -145,7 +165,7 @@
                             <span class="badge-text" id="classification-text">--</span>
                         </div>
                     </div>
-                    
+
                     <!-- Attributes Table -->
                     <div class="attributes-section">
                         <h3>Feature Attributes</h3>
@@ -181,7 +201,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <!-- Parameters Used -->
                     <div class="parameters-section" id="parameters-section" style="display: none;">
                         <h3>Parameters Used</h3>
@@ -190,7 +210,7 @@
                             <span class="param-tag">K: <strong id="param-k">--</strong></span>
                         </div>
                     </div>
-                    
+
                     <!-- Empty State -->
                     <div class="empty-state" id="empty-state">
                         <span class="empty-icon">📋</span>
@@ -208,4 +228,5 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
