@@ -116,7 +116,7 @@ MusangKing_GUI/
 **Group MusangKing**
 *   **Yazid Zaqwan Hakim**
 *   **Muhamad Zulkarnain**
-*   **Amirul Fareez**
+*   **Amirul Fariz**
 *   **Mohamad Bukhari**
 
 **Supervisor**
