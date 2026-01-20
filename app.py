@@ -17,6 +17,9 @@ app.config['MODEL_FOLDER'] = 'TRAINING MODEL'  # Look in TRAINING MODEL folder
 # Ensure upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# Global storage for last processing result (for processing stages page)
+LAST_PROCESSING_RESULT = {}
+
 # ============================================================
 # 1. LOAD TRAINED MODELS
 # ============================================================
@@ -85,19 +88,31 @@ def get_mask_lab_method(image):
 
     # 5. Morphological Operations (Closing)
     kernel = np.ones((5, 5), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+    mask_closed = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+    debug_images['morphology'] = mask_closed # Save intermediate
+
+    # 6. Contour Detection & Selection
+    cnts = cv2.findContours(mask_closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cnts[0] if len(cnts) == 2 else cnts[1]
     
-    # Remove small noise
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    mask_final = np.zeros_like(mask)
+    contour_img = img_resized.copy() # For visualization
+    
     if contours:
         c = max(contours, key=cv2.contourArea)
-        mask_clean = np.zeros_like(mask)
-        cv2.drawContours(mask_clean, [c], -1, 255, -1)
-        mask = mask_clean
+        # Draw all contours in red, largest in green
+        cv2.drawContours(contour_img, contours, -1, (0, 0, 255), 1) 
+        cv2.drawContours(contour_img, [c], -1, (0, 255, 0), 2)
+        
+        # Create final mask from largest contour
+        cv2.drawContours(mask_final, [c], -1, 255, -1)
+        
+    debug_images['contour'] = contour_img
+    debug_images['binary_mask'] = mask_final
     
-    debug_images['morphology'] = mask
+    return mask_final, "Hybrid (K-Means)", debug_images
     
-    return mask, debug_images
+
 
 def get_mask_ai_method(image_path):
     # Uses 'rembg' library (U-2 Net model)
@@ -129,7 +144,7 @@ def smart_segmentation(image_path):
     
     # 1. Run Standard K-Means (Primary)
     print("🔄 Smart Segment: Running Standard K-Means...")
-    mask_lab, debug_imgs = get_mask_lab_method(original)
+    mask_lab, _, debug_imgs = get_mask_lab_method(original)
     
     # Verify if K-Means produced a valid mask (at least 1% fruit)
     if cv2.countNonZero(mask_lab) > (original.shape[0] * original.shape[1] * 0.01):
@@ -154,7 +169,8 @@ def smart_segmentation(image_path):
 
 def phase4_feature_extraction(original_image, mask):
     img = cv2.resize(original_image, (512, 512))
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = cnts[0] if len(cnts) == 2 else cnts[1]
     
     if not contours: return None
     
@@ -195,16 +211,49 @@ def phase4_feature_extraction(original_image, mask):
     ripeness_cols = ['Mean_Hue', 'Compactness', 'Smoothness']
     ripeness_feats = pd.DataFrame([[mean_hue, compactness, smoothness]], columns=ripeness_cols)
     
+    # -----------------------------------------------------
+    # VISUALIZATION 1: GEOMETRIC FEATURES (Step 6)
+    # -----------------------------------------------------
+    vis_geom = img.copy()
+    # Draw convex hull / polygon (Green)
+    cv2.drawContours(vis_geom, [approx], -1, (0, 255, 0), 2)
+    # Draw bounding box (Blue)
+    cv2.rectangle(vis_geom, (x, y), (x+w, y+h), (255, 0, 0), 2)
+    # Add Text (Compactness & Aspect Ratio)
+    cv2.putText(vis_geom, f"Compactness: {compactness:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    cv2.putText(vis_geom, f"Aspect Ratio: {aspect_ratio:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+    # -----------------------------------------------------
+    # VISUALIZATION 2: COLOR ANALYSIS (Step 7 - Histogram)
+    # -----------------------------------------------------
+    # Create dark background
+    vis_hist = np.zeros((300, 512, 3), dtype=np.uint8) + 30 
+    
+    # Draw Histograms for B, G, R
+    colors = ('b', 'g', 'r')
+    for i, col in enumerate(colors):
+        hist = cv2.calcHist([img], [i], mask, [256], [0, 256])
+        cv2.normalize(hist, hist, 0, 300, cv2.NORM_MINMAX)
+        # Scale width by 2 to fill 512px width
+        pts = np.int32(np.column_stack((np.arange(256)*2, 300 - np.int32(hist)))) 
+        cv2.polylines(vis_hist, [pts], False, (255 if i==0 else 0, 255 if i==1 else 0, 255 if i==2 else 0), 2)
+    
+    cv2.putText(vis_hist, f"Mean Red: {mean_red:.1f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    cv2.putText(vis_hist, f"Mean Hue: {mean_hue:.1f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+
     return variety_feats, ripeness_feats, {
         "compactness": round(compactness, 2), 
         "smoothness": round(smoothness, 4), 
         "mean_hue": round(mean_hue, 1),
         "mean_red": round(mean_red, 1),
         "aspect_ratio": round(aspect_ratio, 2)
+    }, {
+        "features": vis_geom,
+        "color_analysis": vis_hist
     }
 
 def classify_durian(v_input, r_input):
-    if MODELS is None: return "Model Error", "unknown", 0.0
+    if MODELS is None: return "Model Error", "unknown", 0.0, None
     
     try:
         # DEBUG: Print feature values
@@ -219,14 +268,27 @@ def classify_durian(v_input, r_input):
         v_name = MODELS['variety_encoder'].inverse_transform([v_pred])[0]
         
         # Get all class probabilities
+        reasoning = {}
         try:
             v_proba = MODELS['variety_model'].predict_proba(v_input)[0]
             v_classes = MODELS['variety_encoder'].classes_
             v_conf = np.max(v_proba) * 100
             
             print(f"\n📊 Variety Prediction Probabilities:", flush=True)
+            proba_breakdown = {}
             for i, cls in enumerate(v_classes):
                 print(f"   {cls}: {v_proba[i]*100:.1f}%", flush=True)
+                # Map class names for display
+                display_cls = {
+                    'D175_UdangMerah': 'Udang Merah',
+                    'D197_MusangKing': 'Musang King',
+                    'D200_BlackThorn': 'Black Thorn'
+                }.get(cls, cls)
+                proba_breakdown[display_cls] = round(v_proba[i]*100, 1)
+            
+            reasoning['probabilities'] = proba_breakdown
+            reasoning['confidence'] = round(v_conf, 1)
+            
         except Exception as e:
             print(f"   Could not get probabilities: {e}", flush=True)
             v_conf = 0.0
@@ -236,7 +298,39 @@ def classify_durian(v_input, r_input):
         
         if v_conf < CONFIDENCE_THRESHOLD:
             print(f"⚠️ Low Confidence ({v_conf:.1f}%). Rejecting as non-durian.")
-            return "Unknown Object / Not Durian", "unknown", v_conf
+            
+            # Build detailed reasoning
+            reasoning['rejected'] = True
+            reasoning['threshold'] = CONFIDENCE_THRESHOLD
+            
+            # Analyze why it's not a durian
+            reasons = []
+            
+            # Check if probabilities are too spread out (uncertain)
+            if 'probabilities' in reasoning:
+                probs = list(reasoning['probabilities'].values())
+                max_prob = max(probs)
+                if max_prob < 35:
+                    reasons.append(f"No variety matched confidently (highest: {max_prob:.1f}%)")
+                if max(probs) - min(probs) < 20:
+                    reasons.append("Probabilities too similar across all classes (model is unsure)")
+            
+            # Feature-based reasoning
+            compactness = v_input['Compactness'].values[0]
+            mean_red = v_input['Mean_Red'].values[0]
+            
+            if compactness > 100:
+                reasons.append(f"Shape too irregular (compactness: {compactness:.1f}, expected: 20-80)")
+            if mean_red < 50 or mean_red > 200:
+                reasons.append(f"Color outside durian range (red channel: {mean_red:.1f})")
+            
+            if not reasons:
+                reasons.append("Object features don't match any trained durian variety")
+            
+            reasoning['reasons'] = reasons
+            reasoning['summary'] = "This object does not appear to be a durian from our trained varieties."
+            
+            return "Unknown Object / Not Durian", "unknown", v_conf, reasoning
 
         print(f"\n🏆 Predicted Variety: {v_name} ({v_conf:.1f}% confidence)", flush=True)
         
@@ -244,13 +338,16 @@ def classify_durian(v_input, r_input):
         r_pred = MODELS['ripeness_model'].predict(r_input)[0]
         r_name = MODELS['ripeness_encoder'].inverse_transform([r_pred])[0]
         
-        # Get ripeness probabilities too
+        # Get ripeness probabilities
         try:
             r_proba = MODELS['ripeness_model'].predict_proba(r_input)[0]
             r_classes = MODELS['ripeness_encoder'].classes_
             print(f"\n📊 Ripeness Prediction Probabilities:", flush=True)
+            ripe_probs = {}
             for i, cls in enumerate(r_classes):
                 print(f"   {cls}: {r_proba[i]*100:.1f}%", flush=True)
+                ripe_probs[cls.capitalize()] = round(r_proba[i]*100, 1)
+            reasoning['ripeness_probabilities'] = ripe_probs
         except:
             pass
         
@@ -274,14 +371,19 @@ def classify_durian(v_input, r_input):
         css_class = css_map.get(v_name, 'unknown')
         ripeness_display = r_name.capitalize()
         
+        reasoning['rejected'] = False
+        reasoning['variety'] = display_name
+        reasoning['ripeness'] = ripeness_display
+        
         text = f"{display_name} ({ripeness_display})"
-        return text, css_class, v_conf
+        return text, css_class, v_conf, reasoning
         
     except Exception as e:
         print(f"❌ Prediction Error: {e}")
         import traceback
         traceback.print_exc()
-        return "Error", "unknown", 0.0
+        return "Error", "unknown", 0.0, None
+
 
 # ============================================================
 # 4. FLASK ROUTES
@@ -303,6 +405,12 @@ def documentation():
 def about():
     return render_template('about.html')
 
+@app.route('/processing_stages')
+def processing_stages():
+    """Display detailed processing stages for the last processed image"""
+    global LAST_PROCESSING_RESULT
+    return render_template('processing_stages.html', data=LAST_PROCESSING_RESULT if LAST_PROCESSING_RESULT else None)
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
     if 'image' not in request.files: return jsonify({'error': 'No file'}), 400
@@ -317,69 +425,88 @@ def upload_image():
 
 @app.route('/process', methods=['POST'])
 def process():
-    data = request.get_json()
-    filename = data.get('filename')
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    
-    if not os.path.exists(path):
-        return jsonify({'error': 'File not found'}), 404
-    
-    # 1. HYBRID SEGMENTATION (The Magic Logic)
-    mask, method_name, debug_imgs = smart_segmentation(path)
-    
-    # 2. FEATURE EXTRACTION
-    original = cv2.imread(path)
-    feats = phase4_feature_extraction(original, mask)
-    
-    if feats is None:
-        return jsonify({'error': 'No fruit detected (Mask is empty)'}), 400
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
-    v_input, r_input, stats = feats
-    
-    # 3. CLASSIFY
-    text, css, conf = classify_durian(v_input, r_input)
-    
-    # 4. SAVE PIPELINE IMAGES
-    pipeline_urls = {}
-    timestamp = int(os.path.getmtime(path)) 
-    
-    # Save the main mask
-    mask_filename = f"mask_{filename}"
-    mask_path = os.path.join(app.config['UPLOAD_FOLDER'], mask_filename)
-    cv2.imwrite(mask_path, mask)
-    
-    # Save intermediate steps
-    if debug_imgs:
-        for name, img in debug_imgs.items():
-            step_filename = f"{name}_{filename}"
-            step_path = os.path.join(app.config['UPLOAD_FOLDER'], step_filename)
-            cv2.imwrite(step_path, img)
-            pipeline_urls[name] = f"/static/uploads/{step_filename}?t={timestamp}"
+        if not os.path.exists(path):
+            return jsonify({'error': 'File not found'}), 404
+        
+        # 1. HYBRID SEGMENTATION (The Magic Logic)
+        mask, method_name, debug_imgs = smart_segmentation(path)
+        
+        # 2. FEATURE EXTRACTION
+        original = cv2.imread(path)
+        feats = phase4_feature_extraction(original, mask)
+        
+        if feats is None:
+            return jsonify({'error': 'No fruit detected (Mask is empty)'}), 400
+            
+        v_input, r_input, stats, viz_imgs = feats
+        
+        # Merge visualization images into debug_imgs for auto-saving
+        if viz_imgs:
+            debug_imgs.update(viz_imgs)
+        
+        # 3. CLASSIFY
+        text, css, conf, reasoning = classify_durian(v_input, r_input)
+        
+        # 4. SAVE PIPELINE IMAGES
+        pipeline_urls = {}
+        timestamp = int(os.path.getmtime(path)) 
+        
+        # Save the main mask
+        mask_filename = f"mask_{filename}"
+        mask_path = os.path.join(app.config['UPLOAD_FOLDER'], mask_filename)
+        cv2.imwrite(mask_path, mask)
+        
+        # Save intermediate steps
+        if debug_imgs:
+            for name, img in debug_imgs.items():
+                step_filename = f"{name}_{filename}"
+                step_path = os.path.join(app.config['UPLOAD_FOLDER'], step_filename)
+                cv2.imwrite(step_path, img)
+                pipeline_urls[name] = f"/static/uploads/{step_filename}?t={timestamp}"
 
-    # Generate final green overlay
-    overlay_filename = f"overlay_{filename}"
-    overlay_path = os.path.join(app.config['UPLOAD_FOLDER'], overlay_filename)
-    
-    img_resized = cv2.resize(original, (512, 512))
-    overlay = img_resized.copy()
-    overlay[mask > 0] = [0, 255, 0] # Green
-    result = cv2.addWeighted(img_resized, 0.7, overlay, 0.3, 0)
-    cv2.imwrite(overlay_path, result)
-    
-    return jsonify({
-        'success': True,
-        'classification': text,
-        'classification_class': css,
-        'confidence': round(conf, 1),
-        'features': stats,
-        'mask_path': f'/static/uploads/{mask_filename}?t={timestamp}',
-        'overlay_path': f'/static/uploads/{overlay_filename}?t={timestamp}',
-        'method_used': method_name,
-        'pipeline': pipeline_urls
-    })
+        # Generate final green overlay
+        overlay_filename = f"overlay_{filename}"
+        overlay_path = os.path.join(app.config['UPLOAD_FOLDER'], overlay_filename)
+        
+        img_resized = cv2.resize(original, (512, 512))
+        overlay = img_resized.copy()
+        overlay[mask > 0] = [0, 255, 0] # Green
+        result = cv2.addWeighted(img_resized, 0.7, overlay, 0.3, 0)
+        cv2.imwrite(overlay_path, result)
+        
+        # Build response data
+        response_data = {
+            'success': True,
+            'classification': text,
+            'classification_class': css,
+            'confidence': round(conf, 1),
+            'features': stats,
+            'mask_path': f'/static/uploads/{mask_filename}?t={timestamp}',
+            'overlay_path': f'/static/uploads/{overlay_filename}?t={timestamp}',
+            'original_path': f'/static/uploads/{filename}?t={timestamp}',
+            'method_used': method_name,
+            'pipeline': pipeline_urls,
+            'reasoning': reasoning
+        }
+        
+        # Store for processing stages page
+        global LAST_PROCESSING_RESULT
+        LAST_PROCESSING_RESULT = response_data
+        
+        return jsonify(response_data)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()}), 500
 
 if __name__ == '__main__':
-    print("🚀 MusangKing Hybrid System Started")
+    print("🚀 MusangKing Hybrid System Started - VERSION 2.1 (FIXED)", flush=True)
     print("   - Primary: K-Means (Lab Materials)")
     print("   - Fallback: AI (rembg)")
     print("   - Scope: Musang King, Black Thorn, Udang Merah")

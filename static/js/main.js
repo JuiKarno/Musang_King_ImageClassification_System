@@ -157,35 +157,15 @@ processBtn.addEventListener('click', async () => {
                 maskContainer.querySelector('.placeholder').style.display = 'none';
             }
 
-            // PIPELINE VISUALIZATION (Modal Popup)
+            // PIPELINE VISUALIZATION (New Page)
             const toggleBtn = document.getElementById('toggle-pipeline-btn');
-            const modal = document.getElementById('pipeline-modal');
-            const closeBtn = document.querySelector('.close-modal');
 
-            if (data.pipeline && toggleBtn && modal) {
+            if (data.pipeline && toggleBtn) {
                 toggleBtn.style.display = 'inline-block';
 
-                // Populate step images
-                if (document.getElementById('step-gamma')) document.getElementById('step-gamma').src = data.pipeline.gamma;
-                if (document.getElementById('step-lab')) document.getElementById('step-lab').src = data.pipeline.lab;
-                if (document.getElementById('step-kmeans')) document.getElementById('step-kmeans').src = data.pipeline.kmeans;
-                if (document.getElementById('step-morph')) document.getElementById('step-morph').src = data.pipeline.morphology;
-
-                // Open Modal
+                // Navigate to new page
                 toggleBtn.onclick = function () {
-                    modal.style.display = "flex";
-                }
-
-                // Close Modal
-                closeBtn.onclick = function () {
-                    modal.style.display = "none";
-                }
-
-                // Close if clicked outside
-                window.onclick = function (event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none";
-                    }
+                    window.open('/processing_stages', '_blank');
                 }
             }
 
@@ -299,4 +279,30 @@ function hideResults() {
 
 console.log('MusangKing Hybrid System');
 console.log('Varieties: Musang King, Black Thorn, Udang Merah');
-console.log('Ripeness: Mature, Immature, Defective');
+console.log('Ripeness: Mature, Defective');
+
+// ============================================
+// Dark Mode Toggle
+// ============================================
+
+(function initDarkMode() {
+    const darkModeBtn = document.getElementById('dark-mode-toggle');
+    const html = document.documentElement;
+
+    // Check for saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+        document.body.classList.add('dark');
+        if (darkModeBtn) darkModeBtn.textContent = '☀️';
+    }
+
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', function () {
+            const isDark = html.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+            this.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    }
+})();

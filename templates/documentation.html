@@ -224,6 +224,7 @@
             </nav>
 
             <div class="header-actions">
+                <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle Dark Mode">🌙</button>
                 <div class="version-badge">v2.0 Hybrid</div>
             </div>
         </header>
@@ -395,6 +396,128 @@
                     </p>
                 </div>
 
+                <!-- 6. Lab Techniques Implementation -->
+                <div class="doc-section">
+                    <h2>6. CSC566 Lab Techniques Implementation</h2>
+                    <p>This system implements various image processing techniques from the CSC566 Image Processing
+                        course labs:</p>
+
+                    <table class="feature-table">
+                        <thead>
+                            <tr>
+                                <th>Lab Topic</th>
+                                <th>Implementation</th>
+                                <th>Code Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>🌓 Gamma Correction</strong></td>
+                                <td>Pre-processing to enhance contrast (γ = 0.6)</td>
+                                <td>app.py:55-60</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🎨 Color Space Transformation</strong></td>
+                                <td>BGR → LAB conversion for better clustering</td>
+                                <td>app.py:62-64</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🔵 K-Means Clustering</strong></td>
+                                <td>Unsupervised segmentation (K=3 clusters)</td>
+                                <td>app.py:66-77</td>
+                            </tr>
+                            <tr>
+                                <td><strong>⬜ Morphological Operations</strong></td>
+                                <td>Closing operation (5×5 kernel, 2 iterations)</td>
+                                <td>app.py:86-88</td>
+                            </tr>
+                            <tr>
+                                <td><strong>📐 Contour Detection</strong></td>
+                                <td>Finding and selecting largest contour</td>
+                                <td>app.py:91-96</td>
+                            </tr>
+                            <tr>
+                                <td><strong>📊 Feature Extraction</strong></td>
+                                <td>Geometric (area, perimeter) and color features</td>
+                                <td>app.py:149-200</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🌈 Histogram/Color Analysis</strong></td>
+                                <td>Mean RGB, Mean HSV extraction</td>
+                                <td>Feature extraction</td>
+                            </tr>
+                            <tr>
+                                <td><strong>⬛ Binary Masking</strong></td>
+                                <td>Region-based segmentation output</td>
+                                <td>Mask generation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Code Examples -->
+                    <h3 style="margin-top: 2rem; color: var(--primary-dark);">📝 Code Implementation Examples</h3>
+
+                    <div class="method-box method-primary" style="margin-top: 1rem;">
+                        <h4>1. Gamma Correction (Point Operations Lab)</h4>
+                        <div class="code-block">
+                            <span class="code-comment"># Gamma correction formula: Output = 255 ×
+                                (Input/255)^(1/γ)</span><br>
+                            <span class="code-keyword">gamma</span> = <span class="code-string">0.6</span><br>
+                            table = np.array([((i / 255.0) ** (1.0/gamma)) * 255<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span
+                                class="code-keyword">in</span> range(256)]).astype(<span
+                                class="code-string">"uint8"</span>)<br>
+                            img_gamma = cv2.LUT(img_resized, table)
+                        </div>
+                    </div>
+
+                    <div class="method-box method-primary">
+                        <h4>2. LAB Color Space (Color Models Lab)</h4>
+                        <div class="code-block">
+                            <span class="code-comment"># Convert BGR to CIE LAB color space</span><br>
+                            <span class="code-comment"># L: Lightness (0-100), a: Green-Red, b: Blue-Yellow</span><br>
+                            img_lab = cv2.cvtColor(img_gamma, cv2.<span class="code-keyword">COLOR_BGR2Lab</span>)
+                        </div>
+                    </div>
+
+                    <div class="method-box method-primary">
+                        <h4>3. K-Means Clustering (Segmentation Lab)</h4>
+                        <div class="code-block">
+                            <span class="code-comment"># K-Means parameters</span><br>
+                            criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, <span
+                                class="code-string">10</span>, <span class="code-string">1.0</span>)<br>
+                            <span class="code-keyword">K</span> = <span class="code-string">3</span>&nbsp;&nbsp;<span
+                                class="code-comment"># Background, Husk, Flesh</span><br><br>
+                            ret, label, center = cv2.kmeans(Z, K, None, criteria, <span class="code-string">10</span>,
+                            cv2.KMEANS_RANDOM_CENTERS)
+                        </div>
+                    </div>
+
+                    <div class="method-box method-primary">
+                        <h4>4. Morphological Closing (Morphology Lab)</h4>
+                        <div class="code-block">
+                            <span class="code-comment"># Closing = Dilation followed by Erosion</span><br>
+                            <span class="code-comment"># Fills small holes and connects nearby regions</span><br>
+                            kernel = np.ones((<span class="code-string">5</span>, <span class="code-string">5</span>),
+                            np.uint8)<br>
+                            mask = cv2.morphologyEx(mask, cv2.<span class="code-keyword">MORPH_CLOSE</span>, kernel,
+                            iterations=<span class="code-string">2</span>)
+                        </div>
+                    </div>
+
+                    <div class="method-box method-primary">
+                        <h4>5. Contour Analysis (Shape Analysis Lab)</h4>
+                        <div class="code-block">
+                            <span class="code-comment"># Find and keep largest contour</span><br>
+                            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)<br>
+                            c = max(contours, key=cv2.contourArea)<br><br>
+                            <span class="code-comment"># Feature formulas</span><br>
+                            compactness = (perimeter ** 2) / area<br>
+                            smoothness = len(approx_vertices) / perimeter
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
 
@@ -402,6 +525,28 @@
             <p>MusangKing Classification System &copy; 2026 | CSC566 Image Processing Project</p>
         </footer>
     </div>
+
+    <script>
+        // Dark Mode Toggle
+        (function () {
+            const btn = document.getElementById('dark-mode-toggle');
+            const html = document.documentElement;
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark') {
+                html.classList.add('dark');
+                document.body.classList.add('dark');
+                if (btn) btn.textContent = '☀️';
+            }
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    const isDark = html.classList.toggle('dark');
+                    document.body.classList.toggle('dark');
+                    this.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                });
+            }
+        })();
+    </script>
 </body>
 
 </html>

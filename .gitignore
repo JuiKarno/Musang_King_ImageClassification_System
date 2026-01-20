@@ -30,3 +30,8 @@ static/uploads/*
 
 # Logs
 *.log
+
+# Archives
+*.zip
+*.rar
+*.tar.gz

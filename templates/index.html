@@ -35,6 +35,7 @@
 
             <!-- Right: Status -->
             <div class="header-actions">
+                <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle Dark Mode">🌙</button>
                 <div class="version-badge">v2.0 Hybrid</div>
             </div>
         </header>
@@ -133,25 +134,124 @@
                     <div id="pipeline-modal" class="modal">
                         <div class="modal-content">
                             <span class="close-modal">&times;</span>
-                            <h3 style="text-align: center; color: var(--primary-dark); margin-bottom: 1.5rem;">Image
-                                Processing Pipeline (K-Means)</h3>
+                            <div class="modal-header">
+                                <h3>🔬 Image Processing Pipeline Details</h3>
+                                <p class="modal-subtitle">Step-by-step breakdown of the segmentation algorithm</p>
+                            </div>
 
                             <div class="pipeline-grid">
+                                <!-- Step 1 -->
                                 <div class="step-card">
-                                    <span class="step-label">1. Gamma Correction</span>
-                                    <img id="step-gamma" src="" alt="Gamma">
+                                    <div class="step-header">
+                                        <span class="step-number">1</span>
+                                        <h4>Gamma Correction</h4>
+                                    </div>
+                                    <img id="step-gamma" src="" alt="Gamma Correction">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Normalization.
+                                        <p>Applies V_out = V_in ^ 0.6. Enhances contrast to handle varying lighting
+                                            conditions across the dataset.</p>
+                                    </div>
                                 </div>
+
+                                <!-- Step 2 -->
                                 <div class="step-card">
-                                    <span class="step-label">2. LAB Color Space</span>
-                                    <img id="step-lab" src="" alt="LAB">
+                                    <div class="step-header">
+                                        <span class="step-number">2</span>
+                                        <h4>LAB Color Space</h4>
+                                    </div>
+                                    <img id="step-lab" src="" alt="LAB Conversion">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Color Separation.
+                                        <p>Converted BGR to CIELAB. Separate Lightness (L) from Color (A,B) channels for
+                                            robust clustering under shadows.</p>
+                                    </div>
                                 </div>
+
+                                <!-- Step 3 -->
                                 <div class="step-card">
-                                    <span class="step-label">3. K-Means (Clustering)</span>
-                                    <img id="step-kmeans" src="" alt="K-Means">
+                                    <div class="step-header">
+                                        <span class="step-number">3</span>
+                                        <h4>K-Means Clustering</h4>
+                                    </div>
+                                    <img id="step-kmeans" src="" alt="K-Means Clustering">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Segmentation.
+                                        <p>Unsupervised clustering with K=3 (Background, Husk, Flesh). Groups pixels by
+                                            color similarity.</p>
+                                    </div>
                                 </div>
+
+                                <!-- Step 4 -->
                                 <div class="step-card">
-                                    <span class="step-label">4. Morphology (Cleanup)</span>
-                                    <img id="step-morph" src="" alt="Morphology">
+                                    <div class="step-header">
+                                        <span class="step-number">4</span>
+                                        <h4>Morphology (Cleanup)</h4>
+                                    </div>
+                                    <img id="step-morph" src="" alt="Morphological Operations">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Noise Removal.
+                                        <p>Closing operation (5x5 kernel). Removes small holes and smooths boundaries
+                                            for a clean mask.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Step 5 -->
+                                <div class="step-card">
+                                    <div class="step-header">
+                                        <span class="step-number">5</span>
+                                        <h4>Contour Detection</h4>
+                                    </div>
+                                    <img id="step-contour" src="" alt="Contour Detection">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Localization.
+                                        <p>Finds all object boundaries. Selects the <strong>largest contour</strong>
+                                            (green) as the primary durian object.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Step 6 -->
+                                <div class="step-card">
+                                    <div class="step-header">
+                                        <span class="step-number">6</span>
+                                        <h4>Feature Extraction</h4>
+                                    </div>
+                                    <div class="step-explanation"
+                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #f8f9fa;">
+                                        <span style="font-size: 3rem; margin-bottom: 1rem;">📏</span>
+                                        <strong>Geometric Features</strong>
+                                        <p style="text-align: center; margin-top: 0.5rem;">Calculates Area, Perimeter,
+                                            and Compactness (4π×Area/Perimeter²) to quantify shape.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Step 7 -->
+                                <div class="step-card">
+                                    <div class="step-header">
+                                        <span class="step-number">7</span>
+                                        <h4>Color Analysis</h4>
+                                    </div>
+                                    <div class="step-explanation"
+                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px; background: #f8f9fa;">
+                                        <span style="font-size: 3rem; margin-bottom: 1rem;">🎨</span>
+                                        <strong>Histogram Analysis</strong>
+                                        <p style="text-align: center; margin-top: 0.5rem;">Computes Mean RGB and HSV
+                                            values within the masked region to characterize husk color.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Step 8 -->
+                                <div class="step-card">
+                                    <div class="step-header">
+                                        <span class="step-number">8</span>
+                                        <h4>Binary Masking</h4>
+                                    </div>
+                                    <img id="step-binary-mask" src="" alt="Final Binary Mask">
+                                    <div class="step-explanation">
+                                        <strong>Why?</strong> Final Output.
+                                        <p>The resulting binary mask (0 or 255) used to isolate the durian pixels for
+                                            the final classification model.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
