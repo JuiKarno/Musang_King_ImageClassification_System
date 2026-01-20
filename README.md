@@ -31,8 +31,7 @@ Instead of relying solely on Deep Learning, this system uses an **8-Step Image P
 ### 3. Detailed Visualization
 *   **Dedicated "Processing Stages" Page**: Visualizes every step of the algorithm.
 *   **Interactive Modal**: See exactly how the computer "sees" the fruit.
-*   **Explainable AI**: Real-time display of calculated feature metrics.
-
+*   **Explainable AI**: Real-time display of calculated feature metrics
 ---
 
 ## 🛠️ Installation
