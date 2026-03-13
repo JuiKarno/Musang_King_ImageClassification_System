@@ -1,127 +1,120 @@
-# 👑 MusangKing Hybrid Classification System
+# 👑 Musang King Image Classification System
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
-![Flask](https://img.shields.io/badge/Flask-2.0-red?logo=flask)
+![Flask](https://img.shields.io/badge/Flask-Web%20App-black?logo=flask)
 ![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-green?logo=opencv)
 ![XGBoost](https://img.shields.io/badge/Model-XGBoost-orange)
+![Git LFS](https://img.shields.io/badge/Git%20LFS-Large%20Files-purple?logo=git)
 
-An integrated image processing system for the classification of Durian Ripeness and Variety using a **Hybrid Pipeline** (K-Means Clustering + Morphological Feature Extraction + XGBoost Classification).
-
-Developed for **CSC566 - Advanced Image Processing** (Oct 2025 – Mar 2026).
+> An intelligent image classification system that identifies **Durian variety** and **ripeness level** using a hybrid computer vision pipeline — built for **CSC566 Advanced Image Processing** at UiTM (Oct 2025 – Mar 2026).
 
 ---
 
-## 🌟 Key Features
+## 🧠 How It Works
 
-### 1. Hybrid Processing Pipeline
-Instead of relying solely on Deep Learning, this system uses an **8-Step Image Processing Pipeline** to extract interpretable features:
-1.  **Gamma Correction**: Normalizes lighting conditions.
-2.  **LAB Color Space**: Enhances color separation (Flesh vs. Husk).
-3.  **K-Means Clustering**: Unsupervised segmentation (K=3).
-4.  **Morphological Cleanup**: Closing operations to refine masks.
-5.  **Contour Detection**: Localizes the primary durian object.
-6.  **Feature Extraction**: Calculates Geometric (Compactness, Aspect Ratio) features.
-7.  **Color Analysis**: Computes RGB/HSV Histograms of the husk.
-8.  **Binary Masking**: Isolates the Region of Interest (ROI).
+Instead of deep learning, this system uses a lightweight **8-Step Hybrid Pipeline** to extract interpretable features from durian images:
 
-### 2. Multi-Class Classification
-*   **Variety**: Musang King (D197), Black Thorn (D200), Udang Merah (D175).
-*   **Ripeness**: Mature, Immature, Defective.
+| Step | Process | Purpose |
+|------|---------|---------|
+| 1 | Gamma Correction | Normalize lighting |
+| 2 | LAB Color Space | Enhance color separation |
+| 3 | K-Means Clustering (K=3) | Segment husk vs. flesh |
+| 4 | Morphological Cleanup | Refine segmentation masks |
+| 5 | Contour Detection | Locate the durian object |
+| 6 | Feature Extraction | Compute geometric features (compactness, aspect ratio) |
+| 7 | Color Analysis | RGB/HSV histogram of husk |
+| 8 | Binary Masking | Isolate region of interest (ROI) |
 
-### 3. Detailed Visualization
-*   **Dedicated "Processing Stages" Page**: Visualizes every step of the algorithm.
-*   **Interactive Modal**: See exactly how the computer "sees" the fruit.
-*   **Explainable AI**: Real-time display of calculated feature metrics
+An **XGBoost classifier** is then trained on these extracted features for fast and accurate prediction.
+
 ---
 
-## 🛠️ Installation
+## 🎯 Classification Targets
 
-### Prerequisites
-*   Python 3.10+
-*   Git
+- **Variety**: Musang King (D197), Black Thorn (D200), Udang Merah (D175)
+- **Ripeness**: Mature, Immature, Defective
 
-### Steps
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/yourusername/MusangKing_GUI.git
-    cd MusangKing_GUI
-    ```
+---
 
-2.  **Create a Virtual Environment**
-    ```bash
-    python -m venv venv
-    # Windows
-    venv\Scripts\activate
-    # Mac/Linux
-    source venv/bin/activate
-    ```
+## 📊 Model Performance
 
-3.  **Install Dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
+| Class | Precision | Recall | F1-Score |
+|-------|-----------|--------|----------|
+| Musang King | 0.95 | 0.91 | 0.93 |
+| Black Thorn | 0.96 | 0.93 | 0.94 |
+| Udang Merah | 0.88 | 0.87 | 0.87 |
+| **Overall** | **88%+** | — | — |
 
-4.  **Run the Application**
-    ```bash
-    python app.py
-    ```
-5.  **Open in Browser**
-    Visit `http://127.0.0.1:5000`
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: Python 3.10, Flask
+- **Computer Vision**: OpenCV
+- **Machine Learning**: XGBoost, scikit-learn
+- **Model Storage**: Git LFS (`.pkl` files)
+
+---
+
+## 🚀 Getting Started
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/JuiKarno/Musang_King_ImageClassification_System.git
+cd Musang_King_ImageClassification_System
+
+# 2. Create and activate virtual environment
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run the app
+python app.py
+```
+
+Then open your browser at: `http://127.0.0.1:5000`
 
 ---
 
 ## 📂 Project Structure
 
 ```
-MusangKing_GUI/
-├── app.py                  # Main Flask Application
-├── debug_model.py          # Script to check model health
-├── train_aligned_model.py  # Script used to train the models
-├── requirements.txt        # Python dependencies
+├── app.py                    # Main Flask application
+├── train_aligned_model.py    # Model training script
+├── debug_model.py            # Model health checker
+├── requirements.txt          # Python dependencies
 │
-├── models_v4_noscale/      # Trained XGBoost Models & Encoders
+├── models_v4_noscale/        # Trained XGBoost models (via Git LFS)
 │   ├── variety_model.pkl
-│   ├── ripeness_model.pkl
-│   └── ...
+│   └── ripeness_model.pkl
 │
-├── static/
-│   ├── css/                # Stylesheets (Dark Mode support)
-│   ├── js/                 # Frontend Logic
-│   └── images/             # Assets (Logos, Team Photos)
-│
-└── templates/
-    ├── index.html              # Dashboard
-    ├── processing_stages.html  # Pipeline Visualization
-    ├── datasets.html           # Model Performance Info
-    ├── documentation.html      # Technical Docs
-    └── about.html              # Team Info
+├── static/                   # CSS, JS, images
+└── templates/                # HTML pages
+    ├── index.html            # Dashboard
+    ├── processing_stages.html # Pipeline visualization
+    ├── datasets.html         # Model performance info
+    ├── documentation.html    # Technical docs
+    └── about.html            # Team info
 ```
 
 ---
 
-## 🧠 Model Performance
+## 👥 Team — Group MusangKing
 
-| Variety | Precision | Recall | F1-Score |
-| :--- | :---: | :---: | :---: |
-| **Musang King** | 0.95 | 0.91 | 0.93 |
-| **Black Thorn** | 0.96 | 0.93 | 0.94 |
-| **Udang Merah** | 0.88 | 0.87 | 0.87 |
-| **Overall Accuracy** | **88%+** | (Hybrid Pipeline) | |
+| Name | Role |
+|------|------|
+| Yazid Zaqwan Hakim | Team Member |
+| Muhamad Zulkarnain | Team Member |
+| Amirul Fariz | Team Member |
+| Mohamad Bukhari | Team Member |
 
----
-
-## 👥 The Team
-
-**Group MusangKing**
-*   **Yazid Zaqwan Hakim**
-*   **Muhamad Zulkarnain**
-*   **Amirul Fariz**
-*   **Mohamad Bukhari**
-
-**Supervisor**
-*   **Dr. Zaaba Ahmad** (FSKM, UiTM)
+**Supervisor**: Dr. Zaaba Ahmad (FSKM, UiTM)
 
 ---
 
 ## 📜 License
-This project is for educational purposes under UiTM.
+
+This project is developed for educational purposes under **Universiti Teknologi MARA (UiTM)**.
